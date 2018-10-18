@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -38,8 +39,16 @@ public:
   void Compute(); // main body of algrithm
   void WriteTo(std::ostream & os) const; // write result to output stream
 
+  typedef pair<int, int> Trip;
+
+private:
+  void ReadTrip(istream & is, Trip & trip);
+
 private:
   // add case-related members here
+  int turnRoundTime_; // turnaround time
+  vector<Trip> tripsA_, tripsB_; // trips' departure times & arrival times
+  int nTrainsNeededA_, nTrainsNeededB_; // results
 };
 
 int main(int argc, char **argv)
@@ -52,6 +61,24 @@ int main(int argc, char **argv)
 
 void Case::ReadFrom(std::istream & is)
 {
+  nTrainsNeededA_ = nTrainsNeededB_ = 0;
+
+  // input turnaround time
+  is >> turnRoundTime_;
+
+  // input number of trips
+  int nTripsA, nTripsB;
+  is >> nTripsA >> nTripsB;
+  tripsA_.resize(nTripsA);
+  tripsB_.resize(nTripsB);
+
+  // input departure and arrival time
+  for (int i = 0; i < nTripsA; ++i) {
+    ReadTrip(is, tripsA_[i]);
+  }
+  for (int i = 0; i < nTripsB; ++i) {
+    ReadTrip(is, tripsB_[i]);
+  }
 }
 
 void Case::Compute()
@@ -60,4 +87,18 @@ void Case::Compute()
 
 void Case::WriteTo(std::ostream & os) const
 {
+  os << nTrainsNeededA_ << ' ' << nTrainsNeededB_;
+}
+
+void Case::ReadTrip(istream & is, Trip & trip)
+{
+  int hh, mm;
+  is >> hh;
+  is.get();
+  is >> mm;
+  trip.first = hh * 60 + mm;
+  is >> hh;
+  is.get();
+  is >> mm;
+  trip.second = hh * 60 + mm;
 }
