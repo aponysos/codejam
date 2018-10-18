@@ -56,8 +56,6 @@ int main(int argc, char **argv)
 
 void Case::ReadFrom(std::istream & is)
 {
-  minSwitchTimes_ = 0;
-
   // read search engine names
   int nEngines = 0;
   cin >> nEngines;
@@ -79,6 +77,8 @@ void Case::ReadFrom(std::istream & is)
 
 void Case::Compute()
 {
+  minSwitchTimes_ = 0; // init result
+
   size_t nEngines = engines_.size(), nQuereis = queries_.size();
   vector<vector<int>> switches(nQuereis + 1); // switches[nQuereis + 1][nEngines]
   for (int iq = 0; iq <= nQuereis; ++iq) {

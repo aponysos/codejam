@@ -61,8 +61,6 @@ int main(int argc, char **argv)
 
 void Case::ReadFrom(std::istream & is)
 {
-  nTrainsNeededA_ = nTrainsNeededB_ = 0;
-
   // input turnaround time
   is >> turnRoundTime_;
 
@@ -83,6 +81,8 @@ void Case::ReadFrom(std::istream & is)
 
 void Case::Compute()
 {
+  nTrainsNeededA_ = nTrainsNeededB_ = 0; // init result
+
 }
 
 void Case::WriteTo(std::ostream & os) const
