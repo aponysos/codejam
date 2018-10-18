@@ -43,7 +43,7 @@ public:
 private:
   std::vector<std::string> engines_;
   std::vector<std::string> queries_;
-  int minSwitch_;
+  int minSwitchTimes_;
 };
 
 int main(int argc, char **argv)
@@ -56,6 +56,8 @@ int main(int argc, char **argv)
 
 void Case::ReadFrom(std::istream & is)
 {
+  minSwitchTimes_ = 0;
+
   // read search engine names
   int nEngines = 0;
   cin >> nEngines;
@@ -98,10 +100,10 @@ void Case::Compute()
     }
   }
 
-  minSwitch_ = *min_element(switches[nQuereis].begin(), switches[nQuereis].end());
+  minSwitchTimes_ = *min_element(switches[nQuereis].begin(), switches[nQuereis].end());
 }
 
 void Case::WriteTo(std::ostream & os) const
 {
-  os << minSwitch_;
+  os << minSwitchTimes_;
 }
