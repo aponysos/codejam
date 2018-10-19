@@ -41,14 +41,18 @@ public:
   void WriteTo(std::ostream & os) const; // write result to output stream
 
   typedef pair<int, int> Trip;
+  typedef vector<Trip> Timeline;
+  enum { DEPARTURE, ARRIVAL };
 
 private:
   void ReadTrip(istream & is, Trip & trip);
+  void InitTimeline(Timeline & tml, const Timeline & dpt, const Timeline & arv);
+  int ComputeTrainsNeeded(const Timeline & tml);
 
 private:
   // add case-related members here
   int turnRoundTime_; // turnaround time
-  vector<Trip> tripsA_, tripsB_; // trips' departure times & arrival times
+  Timeline tripsA_, tripsB_; // trips' departure times & arrival times
   int nTrainsNeededA_, nTrainsNeededB_; // results
 };
 
@@ -84,59 +88,16 @@ void Case::Compute()
 {
   nTrainsNeededA_ = nTrainsNeededB_ = 0; // init result
 
-  size_t nTripsA = tripsA_.size(), nTripsB = tripsB_.size();
-  size_t nTripsAB = nTripsA + nTripsB;
+  size_t nTripsAB = tripsA_.size() + tripsB_.size();
 
   // init timelines
-  vector<pair<int, int>> timelineA(nTripsAB), timelineB(nTripsAB);
-  auto iTimelineA = transform(tripsA_.begin(), tripsA_.end(), timelineA.begin(), 
-    [](const auto & trip) { return make_pair(trip.first, 0); }
-  );
-  transform(tripsB_.begin(), tripsB_.end(), iTimelineA,
-    [this](const auto & trip) { return make_pair(trip.second + turnRoundTime_, 1); }
-  );
-  auto iTimelineB = transform(tripsB_.begin(), tripsB_.end(), timelineB.begin(),
-    [](const auto & trip) { return make_pair(trip.first, 0); }
-  );
-  transform(tripsA_.begin(), tripsA_.end(), iTimelineB,
-    [this](const auto & trip) { return make_pair(trip.second + turnRoundTime_, 1); }
-  );
-
-  // sort timelines
-  sort(timelineA.begin(), timelineA.end(),
-    [](const auto & tm1, const auto & tm2) { 
-      return tm1.first < tm2.first || (tm1.first == tm2.first && tm1.second > tm2.second); }
-  );
-  sort(timelineB.begin(), timelineB.end(),
-    [](const auto & tm1, const auto & tm2) {
-    return tm1.first < tm2.first || (tm1.first == tm2.first && tm1.second > tm2.second); }
-  );
-
+  Timeline timelineA(nTripsAB), timelineB(nTripsAB);
+  InitTimeline(timelineA, tripsA_, tripsB_);
+  InitTimeline(timelineB, tripsB_, tripsA_);
 
   // traverse timelines
-  int availA = 0, availB = 0;
-  for (const auto & i : timelineA) {
-    if (i.second == 0) { // departure
-      if (availA > 0)
-        --availA;
-      else
-        ++nTrainsNeededA_;
-    }
-    else { // arrival
-      ++availA;
-    }
-  }
-  for (const auto & i : timelineB) {
-    if (i.second == 0) { // departure
-      if (availB > 0)
-        --availB;
-      else
-        ++nTrainsNeededB_;
-    }
-    else { // arrival
-      ++availB;
-    }
-  }
+  nTrainsNeededA_ = ComputeTrainsNeeded(timelineA);
+  nTrainsNeededB_ = ComputeTrainsNeeded(timelineB);
 }
 
 void Case::WriteTo(std::ostream & os) const
@@ -148,11 +109,49 @@ void Case::ReadTrip(istream & is, Trip & trip)
 {
   int hh, mm;
   is >> hh;
-  is.get();
+  is.get(); // read ':'
   is >> mm;
   trip.first = hh * 60 + mm;
   is >> hh;
-  is.get();
+  is.get(); // read ':'
   is >> mm;
   trip.second = hh * 60 + mm;
+}
+
+void Case::InitTimeline(Timeline & tml, const Timeline & dpt, const Timeline & arv)
+{
+  // add departure times
+  auto i = transform(dpt.begin(), dpt.end(), tml.begin(),
+    [](const auto & trip) { return make_pair(trip.first, DEPARTURE); }
+  );
+
+  // add arrival times
+  transform(arv.begin(), arv.end(), i,
+    [this](const auto & trip) { return make_pair(trip.second + turnRoundTime_, ARRIVAL); }
+  );
+
+  // sort timelines
+  sort(tml.begin(), tml.end(),
+    [](const auto & tm1, const auto & tm2) {
+    return tm1.first < tm2.first || (tm1.first == tm2.first && tm1.second > tm2.second); }
+  );
+}
+
+int Case::ComputeTrainsNeeded(const Timeline & tml)
+{
+  int nTrainsAvail = 0, nTrainsNeeded = 0;
+
+  for (const auto & i : tml) {
+    if (i.second == DEPARTURE) { // departure
+      if (nTrainsAvail > 0)
+        --nTrainsAvail;
+      else
+        ++nTrainsNeeded;
+    }
+    else { // arrival
+      ++nTrainsAvail;
+    }
+  }
+
+  return nTrainsNeeded;
 }
