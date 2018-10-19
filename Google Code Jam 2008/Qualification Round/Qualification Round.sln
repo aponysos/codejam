@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Saving the Universe", "Savi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Train Timetable", "Train Timetable\Train Timetable.vcxproj", "{109A5960-40B1-49EC-A010-99F9F48366FA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Fly Swatter", "Fly Swatter\Fly Swatter.vcxproj", "{594584EC-E8ED-4E66-9133-5FB59ED4752C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		large-practice|x64 = large-practice|x64
@@ -26,6 +28,12 @@ Global
 		{109A5960-40B1-49EC-A010-99F9F48366FA}.sample|x64.Build.0 = sample|x64
 		{109A5960-40B1-49EC-A010-99F9F48366FA}.small-practice|x64.ActiveCfg = small-practice|x64
 		{109A5960-40B1-49EC-A010-99F9F48366FA}.small-practice|x64.Build.0 = small-practice|x64
+		{594584EC-E8ED-4E66-9133-5FB59ED4752C}.large-practice|x64.ActiveCfg = large-practice|x64
+		{594584EC-E8ED-4E66-9133-5FB59ED4752C}.large-practice|x64.Build.0 = large-practice|x64
+		{594584EC-E8ED-4E66-9133-5FB59ED4752C}.sample|x64.ActiveCfg = sample|x64
+		{594584EC-E8ED-4E66-9133-5FB59ED4752C}.sample|x64.Build.0 = sample|x64
+		{594584EC-E8ED-4E66-9133-5FB59ED4752C}.small-practice|x64.ActiveCfg = small-practice|x64
+		{594584EC-E8ED-4E66-9133-5FB59ED4752C}.small-practice|x64.Build.0 = small-practice|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
