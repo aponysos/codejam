@@ -35,7 +35,7 @@ class Case
 {
 public:
   void ReadFrom(std::istream & is); // read from input stream
-  void Compute(); // main body of algrithm
+  void Compute(); // main body of alogrithm
   void WriteTo(std::ostream & os) const; // write result to output stream
 
 private:

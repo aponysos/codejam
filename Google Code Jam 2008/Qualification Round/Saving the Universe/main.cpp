@@ -36,9 +36,9 @@ private:
 class Case
 {
 public:
-  void ReadFrom(std::istream & is);
-  void Compute();
-  void WriteTo(std::ostream & os) const;
+  void ReadFrom(std::istream & is); // read from input stream
+  void Compute(); // main body of alogrithm
+  void WriteTo(std::ostream & os) const; // write result to output stream
 
 private:
   std::vector<std::string> engines_;
