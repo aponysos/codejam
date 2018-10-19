@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <vector>
+#include<iomanip>
 
 using namespace std;
 
@@ -40,6 +41,8 @@ public:
 
 private:
   // add case-related members here
+  double rFly_, rOuter_, thick_, rString_, gap_;
+  double probability_;
 };
 
 int main(int argc, char **argv)
@@ -52,12 +55,15 @@ int main(int argc, char **argv)
 
 void Case::ReadFrom(std::istream & is)
 {
+  is >> rFly_ >> rOuter_ >> thick_ >> rString_ >> gap_;
 }
 
 void Case::Compute()
 {
+  probability_ = 0.0; // init result
 }
 
 void Case::WriteTo(std::ostream & os) const
 {
+  os << setiosflags(ios::fixed) << setprecision(6) << probability_;
 }
