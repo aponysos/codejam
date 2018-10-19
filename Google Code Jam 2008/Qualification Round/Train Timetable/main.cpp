@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 
@@ -83,6 +84,59 @@ void Case::Compute()
 {
   nTrainsNeededA_ = nTrainsNeededB_ = 0; // init result
 
+  size_t nTripsA = tripsA_.size(), nTripsB = tripsB_.size();
+  size_t nTripsAB = nTripsA + nTripsB;
+
+  // init timelines
+  vector<pair<int, int>> timelineA(nTripsAB), timelineB(nTripsAB);
+  auto iTimelineA = transform(tripsA_.begin(), tripsA_.end(), timelineA.begin(), 
+    [](const auto & trip) { return make_pair(trip.first, 0); }
+  );
+  transform(tripsB_.begin(), tripsB_.end(), iTimelineA,
+    [this](const auto & trip) { return make_pair(trip.second + turnRoundTime_, 1); }
+  );
+  auto iTimelineB = transform(tripsB_.begin(), tripsB_.end(), timelineB.begin(),
+    [](const auto & trip) { return make_pair(trip.first, 0); }
+  );
+  transform(tripsA_.begin(), tripsA_.end(), iTimelineB,
+    [this](const auto & trip) { return make_pair(trip.second + turnRoundTime_, 1); }
+  );
+
+  // sort timelines
+  sort(timelineA.begin(), timelineA.end(),
+    [](const auto & tm1, const auto & tm2) { 
+      return tm1.first < tm2.first || (tm1.first == tm2.first && tm1.second > tm2.second); }
+  );
+  sort(timelineB.begin(), timelineB.end(),
+    [](const auto & tm1, const auto & tm2) {
+    return tm1.first < tm2.first || (tm1.first == tm2.first && tm1.second > tm2.second); }
+  );
+
+
+  // traverse timelines
+  int availA = 0, availB = 0;
+  for (const auto & i : timelineA) {
+    if (i.second == 0) { // departure
+      if (availA > 0)
+        --availA;
+      else
+        ++nTrainsNeededA_;
+    }
+    else { // arrival
+      ++availA;
+    }
+  }
+  for (const auto & i : timelineB) {
+    if (i.second == 0) { // departure
+      if (availB > 0)
+        --availB;
+      else
+        ++nTrainsNeededB_;
+    }
+    else { // arrival
+      ++availB;
+    }
+  }
 }
 
 void Case::WriteTo(std::ostream & os) const
