@@ -51,8 +51,8 @@ private:
   static double Nonnegative(double d);
   static double SectorArea(double radius, double theta);
   static double ChordArea(double radius, double theta);
-  static Point HorPoint(double radius, double y);
-  static Point VerPoint(double radius, double x);
+  static Point HorizontalCrossoverPoint(double radius, double y);
+  static Point VerticalCrossoverPoint(double radius, double x);
 
 private:
   // add case-related members here
@@ -86,8 +86,8 @@ void Case::Compute()
   // init intermediate variables
   aUnhitting_ = 0.0;
   rUnhitting_ = Nonnegative(rOuter_ - thick_ - rFly_);
-  slLattice_ = Nonnegative(gap_ / 2 - rFly_);
-  aLattice_ = slLattice_ * slLattice_ * 4;
+  slLattice_  = Nonnegative(gap_ / 2 - rFly_);
+  aLattice_   = slLattice_ * slLattice_ * 4;
 
   bool isDone = false;
   for (int i = 0; !isDone; ++i) {
@@ -95,10 +95,10 @@ void Case::Compute()
       Point pCenter(
         rString_ + gap_ / 2 + i * (rString_ * 2 + gap_), 
         rString_ + gap_ / 2 + j * (rString_ * 2 + gap_)); // center point of lattic (i, j)
-      Point pLT(pCenter + Point(-slLattice_, slLattice_)); // left top point
+      Point pLT(pCenter + Point(-slLattice_,  slLattice_)); // left top point
       Point pLB(pCenter + Point(-slLattice_, -slLattice_)); // left bottom point
-      Point pRT(pCenter + Point(slLattice_, slLattice_)); // right top point
-      Point pRB(pCenter + Point(slLattice_, -slLattice_)); // right bottom point
+      Point pRT(pCenter + Point( slLattice_,  slLattice_)); // right top point
+      Point pRB(pCenter + Point( slLattice_, -slLattice_)); // right bottom point
 
       // modulus of points
       double mLT = abs(pLT);
@@ -118,37 +118,37 @@ void Case::Compute()
       }
 
       // edge lattice
-      Point pTop = HorPoint(rUnhitting_, pLT.imag());
-      Point pBottom = HorPoint(rUnhitting_, pRB.imag());
-      Point pLeft = VerPoint(rUnhitting_, pLB.real());
-      Point pRight = VerPoint(rUnhitting_, pRT.real());
-      if (mLT >= rUnhitting_ && mRB >= rUnhitting_) {
-        double theta = arg(pLeft) - arg(pBottom);
-        double aChord = ChordArea(rUnhitting_, theta);
-        double aTriangle = (pLeft.imag() - pLB.imag()) * (pBottom.real() - pLB.real()) / 2;
-        aUnhitting_ += (aChord + aTriangle);
+      Point pTop    = HorizontalCrossoverPoint(rUnhitting_, pLT.imag()); // top crossover point
+      Point pBottom = HorizontalCrossoverPoint(rUnhitting_, pRB.imag()); // bottom crossover point
+      Point pLeft   = VerticalCrossoverPoint(rUnhitting_, pLB.real()); // left crossover point
+      Point pRight  = VerticalCrossoverPoint(rUnhitting_, pRT.real()); // right crossover point
+
+      double theta = 0.0; // angle of chord
+      double aPolygon = 0.0; // area of polygon
+
+      if (mLT >= rUnhitting_ && mRB >= rUnhitting_) { // triangle
+        theta = arg(pLeft) - arg(pBottom);
+        aPolygon = (pLeft.imag() - pLB.imag()) * (pBottom.real() - pLB.real()) / 2;
       }
-      else if (mLT <= rUnhitting_ && mRB <= rUnhitting_) {
-        double theta = arg(pTop) - arg(pRight);
-        double aChord = ChordArea(rUnhitting_, theta);
-        double aTriangle = (pRT.imag() - pRight.imag()) * (pRT.real() - pTop.real()) / 2;
-        aUnhitting_ += (aLattice_ - aTriangle + aChord);
+      else if (mLT <= rUnhitting_ && mRB <= rUnhitting_) { // pentagon
+        theta = arg(pTop) - arg(pRight);
+        aPolygon = aLattice_ - (pRT.imag() - pRight.imag()) * (pRT.real() - pTop.real()) / 2;
       }
-      else if (mLT >= rUnhitting_ && mRB <= rUnhitting_) {
-        double theta = arg(pLeft) - arg(pRight);
-        double aChord = ChordArea(rUnhitting_, theta);
-        double aTrapezoid = ((pLeft.imag() - pLB.imag()) + (pRight.imag() - pRB.imag())) * slLattice_;
-        aUnhitting_ += (aChord + aTrapezoid);
+      else if (mLT >= rUnhitting_ && mRB <= rUnhitting_) { // trapezoid
+        theta = arg(pLeft) - arg(pRight);
+        aPolygon = ((pLeft.imag() - pLB.imag()) + (pRight.imag() - pRB.imag())) * slLattice_;
       }
-      else if (mLT <= rUnhitting_ && mRB >= rUnhitting_) {
-        double theta = arg(pTop) - arg(pBottom);
-        double aChord = ChordArea(rUnhitting_, theta);
-        double aTrapezoid = ((pTop.real() - pLT.real()) + (pBottom.real() - pLB.real())) * slLattice_;
-        aUnhitting_ += (aChord + aTrapezoid);
+      else if (mLT <= rUnhitting_ && mRB >= rUnhitting_) { // trapezoid
+        theta = arg(pTop) - arg(pBottom);
+        aPolygon = ((pTop.real() - pLT.real()) + (pBottom.real() - pLB.real())) * slLattice_;
       }
+
+      double aChord = ChordArea(rUnhitting_, theta); // area of chord
+      aUnhitting_ += (aPolygon + aChord); // acumulate area of chord and polygon
     }
   }
 
+  // hitting probability + unhitting probability == 1
   probability_ = 1 - aUnhitting_ / SectorArea(rOuter_, SPI);
 }
 
@@ -176,13 +176,13 @@ double Case::ChordArea(double radius, double theta)
 }
 
 //static 
-Point Case::HorPoint(double radius, double y)
+Point Case::HorizontalCrossoverPoint(double radius, double y)
 {
   return polar(radius, asin(y / radius));
 }
 
 //static 
-Point Case::VerPoint(double radius, double x)
+Point Case::VerticalCrossoverPoint(double radius, double x)
 {
   return polar(radius, acos(x / radius));
 }
