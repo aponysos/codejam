@@ -5,6 +5,8 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <numeric>
 
 using namespace std;
 
@@ -40,6 +42,8 @@ public:
 
 private:
   // add case-related members here
+  vector<int> v1, v2;
+  int minSP_;
 };
 
 int main(int argc, char **argv)
@@ -52,12 +56,27 @@ int main(int argc, char **argv)
 
 void Case::ReadFrom(std::istream & is)
 {
+  size_t n = 0;
+  cin >> n;
+  v1.resize(n);
+  v2.resize(n);
+  for (int i = 0; i < n; ++i)
+    cin >> v1[i];
+  for (int i = 0; i < n; ++i)
+    cin >> v2[i];
 }
 
 void Case::Compute()
 {
+  minSP_ = 0;
+  sort(v1.begin(), v1.end());
+  sort(v2.rbegin(), v2.rend());
+  vector<int> v3(v1.size());
+  transform(v1.begin(), v1.end(), v2.begin(), v3.begin(), std::multiplies<int>());
+  minSP_ = accumulate(v3.begin(), v3.end(), 0);
 }
 
 void Case::WriteTo(std::ostream & os) const
 {
+  os << minSP_;
 }
