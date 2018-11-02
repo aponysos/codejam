@@ -31,6 +31,8 @@ private:
   std::vector<TCase> cases_;
 };
 
+typedef vector<pair<int, int>> Customer;
+
 class Case
 {
 public:
@@ -40,6 +42,10 @@ public:
 
 private:
   // add case-related members here
+  int nFlavors_;
+  vector<Customer> likes_;
+  bool satisfied_;
+  vector<int> flavors_;
 };
 
 int main(int argc, char **argv)
@@ -52,6 +58,19 @@ int main(int argc, char **argv)
 
 void Case::ReadFrom(std::istream & is)
 {
+  is >> nFlavors_;
+  int nCustomers = 0;
+  is >> nCustomers;
+  likes_.resize(nCustomers);
+  for (int i = 0; i < nCustomers; ++i) {
+    int nLikes = 0;
+    is >> nLikes;
+    likes_[i].resize(nLikes);
+    for (int j = 0; j < nLikes; ++j)
+      is >> likes_[i][j].first >> likes_[i][j].second;
+  }
+  satisfied_ = false;
+  flavors_.resize(nCustomers);
 }
 
 void Case::Compute()
@@ -60,4 +79,10 @@ void Case::Compute()
 
 void Case::WriteTo(std::ostream & os) const
 {
+  if (satisfied_) {
+    for (auto i : flavors_)
+      os << i << ' ';
+  }
+  else
+    os << "IMPOSSIBLE";
 }
