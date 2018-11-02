@@ -7,6 +7,9 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
+#include <list>
+#include <functional>
+#include <cmath>
 
 using namespace std;
 
@@ -42,8 +45,8 @@ public:
 
 private:
   // add case-related members here
-  vector<int> v1, v2;
-  int minSP_;
+  vector<long long> v1, v2;
+  long long minSP_;
 };
 
 int main(int argc, char **argv)
@@ -66,14 +69,74 @@ void Case::ReadFrom(std::istream & is)
     cin >> v2[i];
 }
 
+template <typename T> int sgn(T val) {
+  return (T(0) < val) - (val < T(0));
+}
+
 void Case::Compute()
 {
   minSP_ = 0;
-  sort(v1.begin(), v1.end());
-  sort(v2.rbegin(), v2.rend());
-  vector<int> v3(v1.size());
-  transform(v1.begin(), v1.end(), v2.begin(), v3.begin(), std::multiplies<int>());
-  minSP_ = accumulate(v3.begin(), v3.end(), 0);
+
+  auto absGt = [](auto lhs, auto rhs) {
+    return abs(lhs) > abs(rhs) || (abs(lhs) == abs(rhs) && sgn(lhs) > sgn(rhs));
+  };
+  sort(v1.begin(), v1.end(), absGt);
+  sort(v2.begin(), v2.end(), absGt);
+
+  vector<long long> v3;
+  list<long long> l1(v1.begin(), v1.end()), l2(v2.begin(), v2.end());
+  list<long long> *la = nullptr, *lb = nullptr;
+  int s = 0;
+  while (!l1.empty()) {
+    bool b = absGt(*l1.begin(), *l2.begin());
+    auto i = b ? l1.begin() : l2.begin();
+    la = b ? &l1 : &l2;
+    lb = b ? &l2 : &l1;
+    s = sgn(*i);
+
+    auto j = find_if(lb->begin(), lb->end(), [s](auto k) { return sgn(k) != s; });
+
+    if (j == lb->end())
+      break;
+
+    //if (la == &l1)
+    //  cout << *i << " * " << *j << '\n';
+    //else
+    //  cout << *j << " * " << *i << '\n';
+    v3.push_back((*i) * (*j));
+    la->erase(i);
+    lb->erase(j);
+  }
+
+  while (!l1.empty()) {
+    auto i = find_if(la->begin(), la->end(), [s](auto k) { return sgn(k) != s; });
+
+    if (i == la->end())
+      break;
+
+    auto j = find_if(lb->begin(), lb->end(), [s](auto k) { return sgn(k) == s; });
+
+    if (j == lb->end())
+      break;
+
+    //if (la == &l1)
+    //  cout << *i << " * " << *j << '\n';
+    //else
+    //  cout << *j << " * " << *i << '\n';
+    v3.push_back((*i) * (*j));
+    la->erase(i);
+    lb->erase(j);
+  }
+
+  transform(l1.begin(), l1.end(), l2.rbegin(), back_inserter(v3), multiplies<long long>());
+  //for (auto i : l1)
+  //  cout << i << ' ';
+  //cout << '\n';
+  //for (auto i : l2)
+  //  cout << i << ' ';
+  //cout << '\n';
+
+  minSP_ = accumulate(v3.begin(), v3.end(), 0LL);
 }
 
 void Case::WriteTo(std::ostream & os) const
