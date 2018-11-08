@@ -31,6 +31,8 @@ private:
   std::vector<TCase> cases_;
 };
 
+typedef unsigned long long Integer;
+
 class Case
 {
 public:
@@ -40,6 +42,10 @@ public:
 
 private:
   // add case-related members here
+  Integer n_;
+
+  // results
+  Integer modt_;
 };
 
 int main(int argc, char **argv)
@@ -52,6 +58,10 @@ int main(int argc, char **argv)
 
 void Case::ReadFrom(std::istream & is)
 {
+  is >> n_;
+
+  // init results
+  modt_ = 0;
 }
 
 void Case::Compute()
@@ -60,4 +70,5 @@ void Case::Compute()
 
 void Case::WriteTo(std::ostream & os) const
 {
+  os << modt_;
 }
