@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <vector>
+#include <set>
 #include <algorithm>
 
 using namespace std;
@@ -32,7 +33,8 @@ private:
   std::vector<TCase> cases_;
 };
 
-typedef vector<pair<int, int>> Customer;
+typedef pair<int, int> Like;
+typedef vector<Like> Customer;
 
 class Case
 {
@@ -42,15 +44,19 @@ public:
   void WriteTo(std::ostream & os) const; // write result to output stream
 
 private:
-  vector<Customer> CheckFlavors() const;
-  bool CheckCustomer(const Customer & c) const;
-  bool Satisfy(const vector<Customer> & unsatisfied);
+  bool CheckFlavors(set<int> & maltedDemands);  // what flavors are demanded to be malted
+                                                // return false if can not be satisfied
+
+  void Satisfy(const set<int> & maltedDemands); // satisfy malted-likes of unsatisfied customers
 
 private:
   // add case-related members here
-  vector<Customer> likes_;
+  set<Customer> likes_; // unsatisfied customers
+
+  // results
   bool satisfied_;
   vector<int> flavors_;
+
 };
 
 int main(int argc, char **argv)
@@ -67,28 +73,36 @@ void Case::ReadFrom(std::istream & is)
   is >> nFlavors;
   int nCustomers = 0;
   is >> nCustomers;
-  likes_.resize(nCustomers);
   for (int i = 0; i < nCustomers; ++i) {
     int nLikes = 0;
     is >> nLikes;
-    likes_[i].resize(nLikes);
-    for (int j = 0; j < nLikes; ++j)
-      is >> likes_[i][j].first >> likes_[i][j].second;
+    Customer c;
+    for (int j = 0; j < nLikes; ++j) {
+      Like l;
+      is >> l.first >> l.second;
+      c.push_back(l);
+    }
+    likes_.insert(move(c));
   }
 
   // init results
   satisfied_ = false;
-  flavors_.resize(nFlavors);
+  flavors_.resize(nFlavors); // none flavor is malted at first
 }
 
 void Case::Compute()
 {
-  for (vector<Customer> unsatisfied = CheckFlavors(); unsatisfied.size() > 0; unsatisfied = CheckFlavors()) {
-    if (!Satisfy(unsatisfied))
-      return;
+  // keep checking the malted-demands of unsatified customer and satisfying them, 
+  // until no more damands or current damands can not be satisfied.
+  set<int> maltedDemands;
+  while (CheckFlavors(maltedDemands)) { // check for malted-demands
+    if (maltedDemands.size() > 0)
+      Satisfy(maltedDemands); // satisfy malted-demands
+    else { // no more malted-demands
+      satisfied_ = true;
+      break;
+    }
   }
-
-  satisfied_ = true;
 }
 
 void Case::WriteTo(std::ostream & os) const
@@ -101,36 +115,49 @@ void Case::WriteTo(std::ostream & os) const
     os << "IMPOSSIBLE";
 }
 
-vector<Customer> Case::CheckFlavors() const
+bool Case::CheckFlavors(set<int> & maltedDemands)
 {
-  vector<Customer> unsatisfied;
+  maltedDemands.clear();
 
-  for (const auto & c : likes_)
-    if (!CheckCustomer(c))
-      unsatisfied.push_back(c);
+  // traverse all unsatisfied customers
+  for (auto ic = likes_.cbegin(); ic != likes_.cend(); ) {
+    bool isSatisfied = false; // is customer satisfied
+    int maltedFlavor = 0;     // which malted flavor does customer like
 
-  return unsatisfied;
-}
+    // traverse all likes of customer
+    for (auto l : *ic) {
+      // record down customer's malted flavor
+      if (l.second == 1)
+        maltedFlavor = l.first;
 
-bool Case::CheckCustomer(const Customer & c) const
-{
-  for (const auto & l : c) {
-    if (flavors_[l.first - 1] == l.second)
-      return true;
-  }
+      if (flavors_[l.first - 1] == l.second) { // customer satified
+        isSatisfied = true;
 
-  return false;
-}
+        if (l.second == 1)        // malted flavor satisfied, forever satisfied
+          ic = likes_.erase(ic);  // delete customer, move to next customer
+        else    // unmalted flavor satisfied, temporarily satisfied
+          ++ic; // move to next customer
 
-bool Case::Satisfy(const vector<Customer> & unsatisfied)
-{
-  for (const auto c : unsatisfied) {
-    auto i = find_if(c.begin(), c.end(), [](auto l) { return l.second == 1; });
-    if (i != c.end())
-      flavors_[i->first - 1] = 1;
-    else
-      return false;
-  }
+        break; // break likes traversal
+      }
+    } // for likes
+
+    // for unsatisfied customer, check if he can be satisfied and record down his malted flavor
+    if (!isSatisfied) {
+      if (maltedFlavor == 0)  // this unsatisfied customer does not have a malted flavor,
+        return false;         // so he can never be satisfied
+      else {
+        maltedDemands.insert(maltedFlavor); // this flavor will be malted to satisfy this customer
+        ic = likes_.erase(ic);        // delete to-be-satisfied customer
+      }
+    }
+  } // for customers
 
   return true;
+}
+
+void Case::Satisfy(const set<int> & maltedDemands)
+{
+  for (auto m : maltedDemands)
+    flavors_[m - 1] = 1;
 }
