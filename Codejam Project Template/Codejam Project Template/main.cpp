@@ -1,7 +1,8 @@
 // Round
 // Problem
 // URL
-//
+// Command Arguments : < $(Configuration).in > $(Configuration).out
+// 
 
 #include <iostream>
 #include <vector>
