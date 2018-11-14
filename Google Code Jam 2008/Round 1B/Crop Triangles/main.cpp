@@ -41,6 +41,8 @@ public:
 
 private:
   // add case-related members here
+  int n_, A_, B_, C_, D_, x0_, y0_, M_; // input parameters
+  int nTriangles_; // output result
 };
 
 int main(int argc, char **argv)
@@ -53,6 +55,10 @@ int main(int argc, char **argv)
 
 void Case::ReadFrom(std::istream & is)
 {
+  is >> n_ >> A_ >> B_ >> C_ >> D_ >> x0_ >> y0_ >> M_;
+
+  // init result
+  nTriangles_ = 0;
 }
 
 void Case::Compute()
@@ -61,4 +67,5 @@ void Case::Compute()
 
 void Case::WriteTo(std::ostream & os) const
 {
+  os << nTriangles_;
 }
