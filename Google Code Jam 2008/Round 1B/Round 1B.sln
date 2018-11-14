@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2046
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Crop Triangles", "Crop Triangles\Crop Triangles.vcxproj", "{4EFEFC32-E2F9-4BAF-BE56-41A3928654AB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Number Sets", "Number Sets\Number Sets.vcxproj", "{6D3504CC-A6C0-4396-AF73-9B6F91895634}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mousetrap", "Mousetrap\Mousetrap.vcxproj", "{71504E8D-E8B6-45EA-9A6E-77C66693B490}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		large-practice|x64 = large-practice|x64
+		sample|x64 = sample|x64
+		small-practice|x64 = small-practice|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4EFEFC32-E2F9-4BAF-BE56-41A3928654AB}.large-practice|x64.ActiveCfg = large-practice|x64
+		{4EFEFC32-E2F9-4BAF-BE56-41A3928654AB}.large-practice|x64.Build.0 = large-practice|x64
+		{4EFEFC32-E2F9-4BAF-BE56-41A3928654AB}.sample|x64.ActiveCfg = sample|x64
+		{4EFEFC32-E2F9-4BAF-BE56-41A3928654AB}.sample|x64.Build.0 = sample|x64
+		{4EFEFC32-E2F9-4BAF-BE56-41A3928654AB}.small-practice|x64.ActiveCfg = small-practice|x64
+		{4EFEFC32-E2F9-4BAF-BE56-41A3928654AB}.small-practice|x64.Build.0 = small-practice|x64
+		{6D3504CC-A6C0-4396-AF73-9B6F91895634}.large-practice|x64.ActiveCfg = large-practice|x64
+		{6D3504CC-A6C0-4396-AF73-9B6F91895634}.large-practice|x64.Build.0 = large-practice|x64
+		{6D3504CC-A6C0-4396-AF73-9B6F91895634}.sample|x64.ActiveCfg = sample|x64
+		{6D3504CC-A6C0-4396-AF73-9B6F91895634}.sample|x64.Build.0 = sample|x64
+		{6D3504CC-A6C0-4396-AF73-9B6F91895634}.small-practice|x64.ActiveCfg = small-practice|x64
+		{6D3504CC-A6C0-4396-AF73-9B6F91895634}.small-practice|x64.Build.0 = small-practice|x64
+		{71504E8D-E8B6-45EA-9A6E-77C66693B490}.large-practice|x64.ActiveCfg = large-practice|x64
+		{71504E8D-E8B6-45EA-9A6E-77C66693B490}.large-practice|x64.Build.0 = large-practice|x64
+		{71504E8D-E8B6-45EA-9A6E-77C66693B490}.sample|x64.ActiveCfg = sample|x64
+		{71504E8D-E8B6-45EA-9A6E-77C66693B490}.sample|x64.Build.0 = sample|x64
+		{71504E8D-E8B6-45EA-9A6E-77C66693B490}.small-practice|x64.ActiveCfg = small-practice|x64
+		{71504E8D-E8B6-45EA-9A6E-77C66693B490}.small-practice|x64.Build.0 = small-practice|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {03421795-C964-451D-9AA6-966B22DA32D8}
+	EndGlobalSection
+EndGlobal
