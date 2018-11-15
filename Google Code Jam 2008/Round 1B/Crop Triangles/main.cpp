@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -40,9 +41,15 @@ public:
   void WriteTo(std::ostream & os) const; // write result to output stream
 
 private:
+  static bool next_combination(vector<bool> & s);
+
+private:
   // add case-related members here
   int n_, A_, B_, C_, D_, x0_, y0_, M_; // input parameters
   int nTriangles_; // output result
+
+  // intermediate variables
+  vector<int> xnmod3_, ynmod3_;
 };
 
 int main(int argc, char **argv)
@@ -63,9 +70,60 @@ void Case::ReadFrom(std::istream & is)
 
 void Case::Compute()
 {
+  // init intermediate variables
+  xnmod3_.resize(n_);
+  ynmod3_.resize(n_);
+  xnmod3_[0] = x0_;
+  ynmod3_[0] = y0_;
+  for (int i = 1; i < n_; ++i) {
+    xnmod3_[i] = (A_ * xnmod3_[i - 1] + B_) % M_;
+    ynmod3_[i] = (C_ * ynmod3_[i - 1] + D_) % M_;
+  }
+
+  vector<bool> c(n_);
+  c[0] = true;
+  c[1] = true;
+  c[2] = true;
+  do {
+    auto iTrue = find(c.begin(), c.end(), true);
+    size_t v1 = iTrue - c.begin();
+    iTrue = find(iTrue + 1, c.end(), true);
+    size_t v2 = iTrue - c.begin();
+    iTrue = find(iTrue + 1, c.end(), true);
+    size_t v3 = iTrue - c.begin();
+
+    int sumx = xnmod3_[v1] + xnmod3_[v2] + xnmod3_[v3];
+    int sumy = ynmod3_[v1] + ynmod3_[v2] + ynmod3_[v3];
+
+    if (sumx % 3 == 0 && sumy % 3 == 0)
+      ++nTriangles_;
+  }
+  while (next_combination(c));
 }
 
 void Case::WriteTo(std::ostream & os) const
 {
   os << nTriangles_;
+}
+
+//static 
+bool Case::next_combination(vector<bool>& s)
+{
+  const vector<bool> TRUE_FALSE = { true, false };
+  auto iLastTrueFalse = find_end(
+    s.begin(), s.end(), TRUE_FALSE.begin(), TRUE_FALSE.end()); // find last 10 sequence
+
+  if (iLastTrueFalse == s.end()) // no 10 sequence, no more combination
+    return false;
+
+  swap(*iLastTrueFalse, *(iLastTrueFalse + 1)); // change 10 to 01
+
+  auto i = iLastTrueFalse + 2; // first element after 01
+  auto nTrue = count(i, s.end(), true); // 1's number after 01
+  if (nTrue > 0) { // move all 1's to the front after 01
+    fill_n(i, nTrue, true);
+    fill(i + nTrue, s.end(), false);
+  }
+
+  return true;
 }
