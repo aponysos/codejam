@@ -8,7 +8,7 @@
 			"name": "sample",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
+			"program": "${fileDirname}\\main.exe",
 			//"program": "${workspaceFolder}\\main.exe",
 			"args": [
 				"<",
@@ -36,7 +36,7 @@
 			"name": "small-practice",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
+			"program": "${fileDirname}\\main.exe",
 			//"program": "${workspaceFolder}\\main.exe",
 			"args": [
 				"<",
@@ -64,7 +64,7 @@
 			"name": "large-practice",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
+			"program": "${fileDirname}\\main.exe",
 			//"program": "${workspaceFolder}\\main.exe",
 			"args": [
 				"<",

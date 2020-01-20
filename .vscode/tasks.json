@@ -8,9 +8,9 @@
 			"type": "shell",
             "command": "g++.exe",
             "args": [
-				"${fileDirname}\\${fileBasenameNoExtension}.cpp",
+				"${fileDirname}\\main.cpp",
 				"-o",
-				"${fileDirname}\\${fileBasenameNoExtension}.exe",
+				"${fileDirname}\\main.exe",
 				"-g",
 				"-Wall",
 				"-std=c++17",
