@@ -31,6 +31,62 @@
 				}
 			],
 			"preLaunchTask": "build"
-		}
+		},
+		{
+			"name": "small-practice",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
+			//"program": "${workspaceFolder}\\main.exe",
+			"args": [
+				"<",
+				"${fileDirname}\\small-practice.in",
+				">",
+				"${fileDirname}\\small-practice.out",
+			],
+			"stopAtEntry": false,
+			//"cwd": "${workspaceFolder}",
+			"cwd": "${fileDirname}",
+			"environment": [],
+			"externalConsole": false,
+			"MIMode": "gdb",
+			"miDebuggerPath": "gdb.exe",
+			"setupCommands": [
+				{
+					"description": "Enable pretty-printing for gdb",
+					"text": "-enable-pretty-printing",
+					"ignoreFailures": true
+				}
+			],
+			"preLaunchTask": "build"
+		},
+		{
+			"name": "large-practice",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
+			//"program": "${workspaceFolder}\\main.exe",
+			"args": [
+				"<",
+				"${fileDirname}\\large-practice.in",
+				">",
+				"${fileDirname}\\large-practice.out",
+			],
+			"stopAtEntry": false,
+			//"cwd": "${workspaceFolder}",
+			"cwd": "${fileDirname}",
+			"environment": [],
+			"externalConsole": false,
+			"MIMode": "gdb",
+			"miDebuggerPath": "gdb.exe",
+			"setupCommands": [
+				{
+					"description": "Enable pretty-printing for gdb",
+					"text": "-enable-pretty-printing",
+					"ignoreFailures": true
+				}
+			],
+			"preLaunchTask": "build"
+		},
 	]
 }
