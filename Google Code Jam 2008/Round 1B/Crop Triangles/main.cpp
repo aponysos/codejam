@@ -49,7 +49,6 @@ private:
   int nTriangles_; // output result
 
   // intermediate variables
-  vector<int> xnmod3_, ynmod3_;
 };
 
 int main(int argc, char **argv)
@@ -71,8 +70,7 @@ void Case::ReadFrom(std::istream & is)
 void Case::Compute()
 {
   // init intermediate variables
-  xnmod3_.resize(n_);
-  ynmod3_.resize(n_);
+  vector<int> xnmod3_(n_), ynmod3_(n_);
   xnmod3_[0] = x0_;
   ynmod3_[0] = y0_;
   for (int i = 1; i < n_; ++i) {
@@ -84,6 +82,7 @@ void Case::Compute()
   c[0] = true;
   c[1] = true;
   c[2] = true;
+
   do {
     auto iTrue = find(c.begin(), c.end(), true);
     size_t v1 = iTrue - c.begin();
