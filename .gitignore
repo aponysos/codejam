@@ -262,3 +262,6 @@ __pycache__/
 
 # Output files 
 *.out
+
+# Executable files
+*.exe
