@@ -45,7 +45,8 @@ private:
 
 private:
   // add case-related members here
-  int n_, A_, B_, C_, D_, x0_, y0_, M_; // input parameters
+  int n_;
+  long long A_, B_, C_, D_, x0_, y0_, M_; // input parameters
   int nTriangles_; // output result
 
   // intermediate variables
@@ -70,7 +71,7 @@ void Case::ReadFrom(std::istream & is)
 void Case::Compute()
 {
   // init intermediate variables
-  vector<int> xnmod3_(n_), ynmod3_(n_);
+  vector<long long> xnmod3_(n_), ynmod3_(n_);
   xnmod3_[0] = x0_;
   ynmod3_[0] = y0_;
   for (int i = 1; i < n_; ++i) {
@@ -79,20 +80,18 @@ void Case::Compute()
   }
 
   vector<bool> c(n_);
-  c[0] = true;
-  c[1] = true;
-  c[2] = true;
+  c[0] = c[1] = c[2] = true; // first 3 elements selected
 
   do {
     auto iTrue = find(c.begin(), c.end(), true);
-    size_t v1 = iTrue - c.begin();
+    auto v1 = iTrue - c.begin();
     iTrue = find(iTrue + 1, c.end(), true);
-    size_t v2 = iTrue - c.begin();
+    auto v2 = iTrue - c.begin();
     iTrue = find(iTrue + 1, c.end(), true);
-    size_t v3 = iTrue - c.begin();
+    auto v3 = iTrue - c.begin();
 
-    int sumx = xnmod3_[v1] + xnmod3_[v2] + xnmod3_[v3];
-    int sumy = ynmod3_[v1] + ynmod3_[v2] + ynmod3_[v3];
+    auto sumx = xnmod3_[v1] + xnmod3_[v2] + xnmod3_[v3];
+    auto sumy = ynmod3_[v1] + ynmod3_[v2] + ynmod3_[v3];
 
     if (sumx % 3 == 0 && sumy % 3 == 0)
       ++nTriangles_;
@@ -108,7 +107,7 @@ void Case::WriteTo(std::ostream & os) const
 //static 
 bool Case::next_combination(vector<bool>& s)
 {
-  const vector<bool> TRUE_FALSE = { true, false };
+  const vector<bool> TRUE_FALSE = { true, false }; // const 10 sequence
   auto iLastTrueFalse = find_end(
     s.begin(), s.end(), TRUE_FALSE.begin(), TRUE_FALSE.end()); // find last 10 sequence
 
@@ -118,7 +117,7 @@ bool Case::next_combination(vector<bool>& s)
   swap(*iLastTrueFalse, *(iLastTrueFalse + 1)); // change 10 to 01
 
   auto i = iLastTrueFalse + 2; // first element after 01
-  auto nTrue = count(i, s.end(), true); // 1's number after 01
+  auto nTrue = count(i, s.end(), true); // number of 1's after 01
   if (nTrue > 0) { // move all 1's to the front after 01
     fill_n(i, nTrue, true);
     fill(i + nTrue, s.end(), false);
