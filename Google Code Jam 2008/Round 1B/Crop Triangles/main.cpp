@@ -8,7 +8,6 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
-#include <cassert>
 
 using namespace std;
 
@@ -43,7 +42,6 @@ public:
   void WriteTo(std::ostream & os) const; // write result to output stream
 
 private:
-  static bool next_combination(vector<bool> & s);
   static long long C3(long long n); // C(N, 3)
 
 private:
@@ -92,16 +90,10 @@ void Case::Compute()
   for (int i = 0; i < n_; ++i)
     ++cmod3[xnmod3[i]][ynmod3[i]];
 
-  auto c3_add = [] (auto & a, auto & b) {
-    assert(a >= 0);
-    auto c3 = C3(b);
-    assert(c3 >= 0);
-    c3 += a;
-    assert(c3 >= 0);
-    return c3;
-  };
+  // points from the same set. C(n, 3)
   long long * pcmod3 = &cmod3[0][0];
-  nTriangles_ += accumulate(pcmod3, pcmod3 + 9, 0LL, c3_add);
+  nTriangles_ += accumulate(pcmod3, pcmod3 + 9, 0LL, [] (auto & a, auto & b) { return a + C3(b); });
+  // points from 3 different sets where cordinates sum up to 0 or 3 or 6
   nTriangles_ += cmod3[0][0] * cmod3[0][1] * cmod3[0][2];
   nTriangles_ += cmod3[1][0] * cmod3[1][1] * cmod3[1][2];
   nTriangles_ += cmod3[2][0] * cmod3[2][1] * cmod3[2][2];
@@ -122,38 +114,7 @@ void Case::WriteTo(std::ostream & os) const
 }
 
 //static 
-bool Case::next_combination(vector<bool>& s)
-{
-  const vector<bool> TRUE_FALSE = { true, false }; // const 10 sequence
-  auto iLastTrueFalse = find_end(
-    s.begin(), s.end(), TRUE_FALSE.begin(), TRUE_FALSE.end()); // find last 10 sequence
-
-  if (iLastTrueFalse == s.end()) // no 10 sequence, no more combination
-    return false;
-
-  swap(*iLastTrueFalse, *(iLastTrueFalse + 1)); // change 10 to 01
-
-  auto i = iLastTrueFalse + 2; // first element after 01
-  auto nTrue = count(i, s.end(), true); // number of 1's after 01
-  if (nTrue > 0) { // move all 1's to the front after 01
-    fill_n(i, nTrue, true);
-    fill(i + nTrue, s.end(), false);
-  }
-
-  return true;
-}
-
-//static 
 long long Case::C3(long long n)
 {
-  long long c3 = 0;
-  if (n >= 3) {
-    c3 = n;
-    c3 *= n - 1;
-    assert(c3 >= 0);
-    c3 *= n - 2;
-    assert(c3 >= 0);
-    c3 /= 6;
-  }
-  return c3;
+  return n >= 3 ? n * (n - 1) * (n - 2) / 6 : 0;
 }
