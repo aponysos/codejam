@@ -36,11 +36,13 @@ class Case
 {
 public:
   void ReadFrom(std::istream & is); // read from input stream
-  void Compute(); // main body of alogrithm
   void WriteTo(std::ostream & os) const; // write result to output stream
+  void Compute(); // main body of alogrithm
 
 private:
   // add case-related members here
+  long long a_, b_, p_;
+  int nSets_; // result
 };
 
 int main(int argc, char **argv)
@@ -53,12 +55,17 @@ int main(int argc, char **argv)
 
 void Case::ReadFrom(std::istream & is)
 {
-}
+  is >> a_ >> b_ >> p_;
 
-void Case::Compute()
-{
+  // init result
+  nSets_ = 0;
 }
 
 void Case::WriteTo(std::ostream & os) const
+{
+  os << nSets_;
+}
+
+void Case::Compute()
 {
 }
