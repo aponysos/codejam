@@ -5,7 +5,6 @@
 // 
 
 #include <iostream>
-#include <vector>
 
 using namespace std;
 
@@ -17,9 +16,8 @@ public:
   {
     int nCase = 0;
     is >> nCase;
-    cases_.resize(nCase);
     for (int i = 0; i < nCase; ++i) {
-      TCase & c = cases_[i];
+      TCase c;
       c.ReadFrom(is);
       c.Compute();
       os << "Case #" << i + 1 << ": ";
@@ -27,17 +25,15 @@ public:
       os << '\n';
     }
   }
-
-private:
-  std::vector<TCase> cases_;
 };
 
 class Case
 {
 public:
   void ReadFrom(std::istream & is); // read from input stream
-  void Compute(); // main body of alogrithm
   void WriteTo(std::ostream & os) const; // write result to output stream
+
+  void Compute(); // main body of alogrithm
 
 private:
   // add case-related members here
@@ -55,10 +51,10 @@ void Case::ReadFrom(std::istream & is)
 {
 }
 
-void Case::Compute()
+void Case::WriteTo(std::ostream & os) const
 {
 }
 
-void Case::WriteTo(std::ostream & os) const
+void Case::Compute()
 {
 }
