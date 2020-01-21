@@ -8,6 +8,7 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
+#include <cassert>
 
 using namespace std;
 
@@ -48,7 +49,7 @@ private:
 private:
   // add case-related members here
   int n_, A_, B_, C_, D_, x0_, y0_, M_; // input parameters
-  int nTriangles_; // output result
+  long long nTriangles_; // output result
 
   // intermediate variables
 };
@@ -91,8 +92,16 @@ void Case::Compute()
   for (int i = 0; i < n_; ++i)
     ++cmod3[xnmod3[i]][ynmod3[i]];
 
+  auto c3_add = [] (auto & a, auto & b) {
+    assert(a >= 0);
+    auto c3 = C3(b);
+    assert(c3 >= 0);
+    c3 += a;
+    assert(c3 >= 0);
+    return c3;
+  };
   long long * pcmod3 = &cmod3[0][0];
-  nTriangles_ += accumulate(pcmod3, pcmod3 + 9, 0, [] (auto & a, auto & b) { return a + C3(b); });
+  nTriangles_ += accumulate(pcmod3, pcmod3 + 9, 0LL, c3_add);
   nTriangles_ += cmod3[0][0] * cmod3[0][1] * cmod3[0][2];
   nTriangles_ += cmod3[1][0] * cmod3[1][1] * cmod3[1][2];
   nTriangles_ += cmod3[2][0] * cmod3[2][1] * cmod3[2][2];
@@ -141,7 +150,9 @@ long long Case::C3(long long n)
   if (n >= 3) {
     c3 = n;
     c3 *= n - 1;
+    assert(c3 >= 0);
     c3 *= n - 2;
+    assert(c3 >= 0);
     c3 /= 6;
   }
   return c3;
