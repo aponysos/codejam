@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <numeric>
 
 using namespace std;
 
@@ -42,11 +43,11 @@ public:
 
 private:
   static bool next_combination(vector<bool> & s);
+  static long long C3(long long n); // C(N, 3)
 
 private:
   // add case-related members here
-  int n_;
-  long long A_, B_, C_, D_, x0_, y0_, M_; // input parameters
+  int n_, A_, B_, C_, D_, x0_, y0_, M_; // input parameters
   int nTriangles_; // output result
 
   // intermediate variables
@@ -70,33 +71,40 @@ void Case::ReadFrom(std::istream & is)
 
 void Case::Compute()
 {
-  // init intermediate variables
-  vector<long long> xnmod3_(n_), ynmod3_(n_);
-  xnmod3_[0] = x0_;
-  ynmod3_[0] = y0_;
+  // coordinates sequences
+  vector<long long> xn(n_), yn(n_);
+  xn[0] = x0_;
+  yn[0] = y0_;
   for (int i = 1; i < n_; ++i) {
-    xnmod3_[i] = (A_ * xnmod3_[i - 1] + B_) % M_;
-    ynmod3_[i] = (C_ * ynmod3_[i - 1] + D_) % M_;
+    xn[i] = (A_ * xn[i - 1] + B_) % M_;
+    yn[i] = (C_ * yn[i - 1] + D_) % M_;
   }
 
-  vector<bool> c(n_);
-  c[0] = c[1] = c[2] = true; // first 3 elements selected
+  // coordinates mod 3
+  vector<long long> xnmod3(n_), ynmod3(n_);
+  generate(xnmod3.begin(), xnmod3.end(), [&, i = 0] () mutable { return xn[i++] % 3; });
+  generate(ynmod3.begin(), ynmod3.end(), [&, i = 0] () mutable { return yn[i++] % 3; });
 
-  do {
-    auto iTrue = find(c.begin(), c.end(), true);
-    auto v1 = iTrue - c.begin();
-    iTrue = find(iTrue + 1, c.end(), true);
-    auto v2 = iTrue - c.begin();
-    iTrue = find(iTrue + 1, c.end(), true);
-    auto v3 = iTrue - c.begin();
+  // divide points into 9 sets according to coordinates mod3
+  // count the numbers of the 9 sets
+  long long cmod3[3][3] = {0};
+  for (int i = 0; i < n_; ++i)
+    ++cmod3[xnmod3[i]][ynmod3[i]];
 
-    auto sumx = xnmod3_[v1] + xnmod3_[v2] + xnmod3_[v3];
-    auto sumy = ynmod3_[v1] + ynmod3_[v2] + ynmod3_[v3];
-
-    if (sumx % 3 == 0 && sumy % 3 == 0)
-      ++nTriangles_;
-  }
-  while (next_combination(c));
+  long long * pcmod3 = &cmod3[0][0];
+  nTriangles_ += accumulate(pcmod3, pcmod3 + 9, 0, [] (auto & a, auto & b) { return a + C3(b); });
+  nTriangles_ += cmod3[0][0] * cmod3[0][1] * cmod3[0][2];
+  nTriangles_ += cmod3[1][0] * cmod3[1][1] * cmod3[1][2];
+  nTriangles_ += cmod3[2][0] * cmod3[2][1] * cmod3[2][2];
+  nTriangles_ += cmod3[0][0] * cmod3[1][0] * cmod3[2][0];
+  nTriangles_ += cmod3[0][1] * cmod3[1][1] * cmod3[2][1];
+  nTriangles_ += cmod3[0][2] * cmod3[1][2] * cmod3[2][2];
+  nTriangles_ += cmod3[0][0] * cmod3[1][1] * cmod3[2][2];
+  nTriangles_ += cmod3[0][0] * cmod3[2][1] * cmod3[1][2];
+  nTriangles_ += cmod3[1][0] * cmod3[0][1] * cmod3[2][2];
+  nTriangles_ += cmod3[1][0] * cmod3[2][1] * cmod3[0][2];
+  nTriangles_ += cmod3[2][0] * cmod3[1][1] * cmod3[0][2];
+  nTriangles_ += cmod3[2][0] * cmod3[0][1] * cmod3[1][2];
 }
 
 void Case::WriteTo(std::ostream & os) const
@@ -124,4 +132,17 @@ bool Case::next_combination(vector<bool>& s)
   }
 
   return true;
+}
+
+//static 
+long long Case::C3(long long n)
+{
+  long long c3 = 0;
+  if (n >= 3) {
+    c3 = n;
+    c3 *= n - 1;
+    c3 *= n - 2;
+    c3 /= 6;
+  }
+  return c3;
 }
