@@ -32,7 +32,7 @@ public:
   }
 };
 
-typedef long long Integer;
+typedef unsigned long long Integer;
 
 class Case
 {
@@ -45,9 +45,10 @@ public:
 private:
   Integer MergeSets(Integer p);
 
-  static Integer NextPrime(Integer val);
   static bool IsPrime(Integer val);
-  static Integer ConstructPrimes(Integer val);
+
+public:
+  static void ConstructPrimes(Integer val);
 
 private:
   // input & output
@@ -62,6 +63,8 @@ private:
 
 int main(int argc, char **argv)
 {
+  Case::ConstructPrimes(1000000);
+
   Problem<Case> p;
   p.Solve(cin, cout);
 
@@ -87,10 +90,13 @@ void Case::Compute()
   m_.resize(nInt_);
   iota(m_.begin(), m_.end(), 0);
 
-  Integer maxp = ConstructPrimes(nInt_);
-  for (Integer p = NextPrime(p_ - 1); p <= maxp; p = NextPrime(p))
+  auto iend = lower_bound(primes_.begin(), primes_.end(), nInt_);
+  auto ip = lower_bound(primes_.begin(), primes_.end(), p_);
+  cerr << *ip << "->" << *iend << " : " << iend - ip << " primes" << endl;
+
+  for (; ip < iend; ++ip)
   {
-    Integer nMerged = MergeSets(p);
+    Integer nMerged = MergeSets(*ip);
     nSets_ -= nMerged;
   }
 }
@@ -98,8 +104,8 @@ void Case::Compute()
 Integer Case::MergeSets(Integer p)
 {
   Integer nMerged = 0;
-  for (Integer to = (0 == a_ % p ? 0 : p - a_ % p), from = to + p; 
-    from < nInt_; from += p)
+  for (Integer to = (0 == a_ % p ? 0 : p - a_ % p), from = to + p;
+       from < nInt_; from += p)
   {
     Integer f = from, t = to;
     while (m_[f] != f)
@@ -120,16 +126,6 @@ Integer Case::MergeSets(Integer p)
 vector<Integer> Case::primes_ = {2, 3};
 
 //static
-Integer Case::NextPrime(Integer val)
-{
-  auto iNext = upper_bound(primes_.begin(), primes_.end(), val);
-  if (iNext != primes_.end())
-    return *iNext;
-  else
-    return ConstructPrimes(val);
-}
-
-//static
 bool Case::IsPrime(Integer val)
 {
   Integer sq = sqrt(val);
@@ -140,18 +136,19 @@ bool Case::IsPrime(Integer val)
 }
 
 //static
-Integer Case::ConstructPrimes(Integer val)
+void Case::ConstructPrimes(Integer val)
 {
-  Integer pNew = primes_[primes_.size() - 1] + 2;
-  for (; pNew <= val; pNew += 2)
-  {
-    if (IsPrime(pNew))
+  Integer pLast = primes_[primes_.size() - 1];
+  Integer pNew = pLast;
+
+ while (pLast < val)
+ {
+    pNew += 2;
+    if (IsPrime(pNew)) {
       primes_.push_back(pNew);
+      pLast = pNew;
+    }
   }
 
-  while (!IsPrime(pNew))
-    pNew += 2;
-
-  primes_.push_back(pNew);
-  return pNew;
+  cerr << primes_.size() << " primes. max is " << *(primes_.end() - 1) << endl;
 }
