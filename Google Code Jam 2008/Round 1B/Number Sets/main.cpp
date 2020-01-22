@@ -9,6 +9,7 @@
 #include <numeric>
 #include <algorithm>
 #include <cmath>
+#include <chrono>
 
 using namespace std;
 
@@ -61,6 +62,24 @@ private:
   static vector<Integer> primes_;
 };
 
+class AutoClock
+{
+public:
+  AutoClock(const std::string &funcName) : funcName_(funcName), start_(std::chrono::system_clock::now()) {}
+  ~AutoClock()
+  {
+    auto elapsed_ = std::chrono::system_clock::now() - start_;
+    std::clog << funcName_ << ": " << (double)elapsed_.count() / 1000 / 1000 << "ms" << std::endl;
+  }
+
+private:
+  std::string funcName_;
+  std::chrono::time_point<std::chrono::system_clock> start_;
+};
+
+//#define TRACE() AutoClock ac(__FUNCTION__)
+#define TRACE() 
+
 int main(int argc, char **argv)
 {
   Case::ConstructPrimes(1000000);
@@ -86,13 +105,14 @@ void Case::WriteTo(std::ostream &os) const
 
 void Case::Compute()
 {
+  TRACE();
   nSets_ = nInt_ = b_ - a_ + 1;
   m_.resize(nInt_);
   iota(m_.begin(), m_.end(), 0);
 
   auto iend = lower_bound(primes_.begin(), primes_.end(), nInt_);
   auto ip = lower_bound(primes_.begin(), primes_.end(), p_);
-  cerr << *ip << "->" << *iend << " : " << iend - ip << " primes" << endl;
+  clog << *ip << "->" << *iend << " : " << iend - ip << " primes" << '\n';
 
   for (; ip < iend; ++ip)
   {
@@ -118,6 +138,9 @@ Integer Case::MergeSets(Integer p)
       m_[f] = m_[t];
       ++nMerged;
     }
+
+    m_[from] = m_[f];
+    m_[to] = m_[t];
   }
   return nMerged;
 }
@@ -141,14 +164,15 @@ void Case::ConstructPrimes(Integer val)
   Integer pLast = primes_[primes_.size() - 1];
   Integer pNew = pLast;
 
- while (pLast < val)
- {
+  while (pLast < val)
+  {
     pNew += 2;
-    if (IsPrime(pNew)) {
+    if (IsPrime(pNew))
+    {
       primes_.push_back(pNew);
       pLast = pNew;
     }
   }
 
-  cerr << primes_.size() << " primes. max is " << *(primes_.end() - 1) << endl;
+  clog << primes_.size() << " primes constructed. the max one is " << *(primes_.end() - 1) << '\n';
 }
