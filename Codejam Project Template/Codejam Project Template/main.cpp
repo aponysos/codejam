@@ -2,22 +2,23 @@
 // Problem
 // URL
 // Command Arguments : < $(Configuration).in > $(Configuration).out
-// 
+//
 
 #include <iostream>
 #include <chrono>
 
 using namespace std;
 
-template<typename TCase>
+template <typename TCase>
 class Problem
 {
 public:
-  void Solve(std::istream & is, std::ostream & os)
+  void Solve(std::istream &is, std::ostream &os)
   {
     int nCase = 0;
     is >> nCase;
-    for (int i = 0; i < nCase; ++i) {
+    for (int i = 0; i < nCase; ++i)
+    {
       TCase c;
       c.ReadFrom(is);
       c.Compute();
@@ -31,8 +32,8 @@ public:
 class Case
 {
 public:
-  void ReadFrom(std::istream & is); // read from input stream
-  void WriteTo(std::ostream & os) const; // write result to output stream
+  void ReadFrom(std::istream &is);      // read from input stream
+  void WriteTo(std::ostream &os) const; // write result to output stream
 
   void Compute(); // main body of alogrithm
 
@@ -40,7 +41,6 @@ private:
   // input & output
 
   // auto-output execution time of a function
-
 };
 
 // auto-output execution time of a function
@@ -70,11 +70,11 @@ int main(int argc, char **argv)
   return 0;
 }
 
-void Case::ReadFrom(std::istream & is)
+void Case::ReadFrom(std::istream &is)
 {
 }
 
-void Case::WriteTo(std::ostream & os) const
+void Case::WriteTo(std::ostream &os) const
 {
 }
 
