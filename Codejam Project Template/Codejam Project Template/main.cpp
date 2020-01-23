@@ -38,9 +38,9 @@ public:
   void Compute(); // main body of alogrithm
 
 private:
-  // input & output
+  // input & output members
 
-  // auto-output execution time of a function
+  // intermediate members
 };
 
 // auto-output execution time of a function
