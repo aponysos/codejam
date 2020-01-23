@@ -6,9 +6,9 @@
 
 #include <iostream>
 #include <vector>
-#include <numeric>
-#include <algorithm>
-#include <cmath>
+#include <numeric> // iota
+#include <algorithm> // lower_bound
+#include <cmath> // sqrt
 #include <chrono>
 
 using namespace std;
@@ -44,12 +44,11 @@ public:
   void Compute(); // main body of alogrithm
 
 private:
-  Integer MergeSets(Integer p);
-
-  static bool IsPrime(Integer val);
+  Integer MergeSets(Integer p); // merge sets of mutiples of p, return # of sets decreased, 0 if none
 
 public:
-  static void ConstructPrimes(Integer val);
+  static void ConstructPrimes(Integer val); // the max prime number is equal or greater than val
+  static bool IsPrime(Integer val);         // if val is a prime number
 
 private:
   // input & output
@@ -57,11 +56,12 @@ private:
   Integer nSets_;     // output
 
   // intermediate variables
-  Integer nInt_;
-  vector<Integer> m_;
-  static vector<Integer> primes_;
+  Integer nInt_;                  // length of interval: b_ - a_ + 1
+  vector<Integer> m_;             // sets map
+  static vector<Integer> primes_; // prime numbers cache
 };
 
+// auto-output execution time of a function
 class AutoClock
 {
 public:
@@ -78,7 +78,7 @@ private:
 };
 
 //#define TRACE() AutoClock ac(__FUNCTION__)
-#define TRACE() 
+#define TRACE()
 
 int main(int argc, char **argv)
 {
@@ -106,14 +106,16 @@ void Case::WriteTo(std::ostream &os) const
 void Case::Compute()
 {
   TRACE();
+
   nSets_ = nInt_ = b_ - a_ + 1;
   m_.resize(nInt_);
-  iota(m_.begin(), m_.end(), 0);
+  iota(m_.begin(), m_.end(), 0); // init map {0, 1, 2, ...}
 
-  auto iend = lower_bound(primes_.begin(), primes_.end(), nInt_);
-  auto ip = lower_bound(primes_.begin(), primes_.end(), p_);
+  auto ip = lower_bound(primes_.begin(), primes_.end(), p_);      // min prime number >= p_
+  auto iend = lower_bound(primes_.begin(), primes_.end(), nInt_); // max one >= length of interval
   clog << *ip << "->" << *iend << " : " << iend - ip << " primes" << '\n';
 
+  // traverse prime numbers from *ip to *iend
   for (; ip < iend; ++ip)
   {
     Integer nMerged = MergeSets(*ip);
@@ -124,21 +126,26 @@ void Case::Compute()
 Integer Case::MergeSets(Integer p)
 {
   Integer nMerged = 0;
+  // to is the min number that is multiples of p, from is second min one
+  // merge set of from to set of to
+  // advance from by p
   for (Integer to = (0 == a_ % p ? 0 : p - a_ % p), from = to + p;
        from < nInt_; from += p)
   {
     Integer f = from, t = to;
-    while (m_[f] != f)
+    while (m_[f] != f) // find set root of from
       f = m_[f];
-    while (m_[t] != t)
+    while (m_[t] != t) // find set root of from
       t = m_[t];
 
-    if (m_[f] != m_[t])
+    if (m_[f] != m_[t]) // merge
     {
       m_[f] = m_[t];
       ++nMerged;
     }
 
+    // link from & to directly to set root
+    // this optimization reduces the execution time greatly
     m_[from] = m_[f];
     m_[to] = m_[t];
   }
@@ -151,7 +158,7 @@ vector<Integer> Case::primes_ = {2, 3};
 //static
 bool Case::IsPrime(Integer val)
 {
-  Integer sq = sqrt(val);
+  Integer sq = sqrt(val); // check primes numbers up to square of val
   for (int i = 0; primes_[i] <= sq; ++i)
     if (0 == val % primes_[i])
       return false;
@@ -161,12 +168,13 @@ bool Case::IsPrime(Integer val)
 //static
 void Case::ConstructPrimes(Integer val)
 {
-  Integer pLast = primes_[primes_.size() - 1];
+  Integer pLast = *primes_.rbegin(); // last one of primes_
   Integer pNew = pLast;
 
+  // construct new prime number from the last one of primes_
   while (pLast < val)
   {
-    pNew += 2;
+    pNew += 2; // step 2
     if (IsPrime(pNew))
     {
       primes_.push_back(pNew);
