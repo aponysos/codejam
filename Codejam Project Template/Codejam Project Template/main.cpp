@@ -5,6 +5,7 @@
 // 
 
 #include <iostream>
+#include <chrono>
 
 using namespace std;
 
@@ -36,8 +37,30 @@ public:
   void Compute(); // main body of alogrithm
 
 private:
-  // add case-related members here
+  // input & output
+
+  // auto-output execution time of a function
+
 };
+
+// auto-output execution time of a function
+class AutoClock
+{
+public:
+  AutoClock(const std::string &funcName) : funcName_(funcName), start_(std::chrono::system_clock::now()) {}
+  ~AutoClock()
+  {
+    auto elapsed_ = std::chrono::system_clock::now() - start_;
+    std::clog << funcName_ << ": " << (double)elapsed_.count() / 1000 / 1000 << "ms" << std::endl;
+  }
+
+private:
+  std::string funcName_;
+  std::chrono::time_point<std::chrono::system_clock> start_;
+};
+
+#define TRACE() AutoClock ac(__FUNCTION__)
+//#define TRACE()
 
 int main(int argc, char **argv)
 {
@@ -57,4 +80,5 @@ void Case::WriteTo(std::ostream & os) const
 
 void Case::Compute()
 {
+  TRACE();
 }
