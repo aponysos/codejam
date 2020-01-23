@@ -7,6 +7,7 @@
 #include <iostream>
 #include <chrono>
 #include <vector>
+#include <list>
 #include <algorithm> // for_each
 
 using namespace std;
@@ -45,7 +46,7 @@ private:
   vector<int> d_;
   vector<int> deck_;
 
-  // auto-output execution time of a function
+  // intermediate members
 };
 
 // auto-output execution time of a function
@@ -65,6 +66,7 @@ private:
 };
 
 #define TRACE() AutoClock ac(__FUNCTION__)
+#define TRACE(str) AutoClock ac(str)
 //#define TRACE()
 
 int main(int argc, char **argv)
@@ -94,25 +96,25 @@ void Case::Compute()
 {
   TRACE();
 
-  vector<bool> removed_(k_);
-  deck_[0] = 1;
-  removed_[0] = 1;
+  list<pair<int, int>> cards_(k_);
+  std::generate(cards_.begin(), cards_.end(),
+                [n = 0]() mutable { return pair<int, int>(n++, 0); });
 
-  for (int card = 2, cur = 0; card <= k_; ++card)
+  auto cur = cards_.begin();
+  for (int card = 1; card <= k_; ++card)
   {
-    int step = 0;
-
-    do
+    for (int step = 1; step < card; ++step)
     {
-      cur = (cur + 1) % k_;
-      if (!removed_[cur])
-        ++step;
-    } while (step < card);
+      ++cur;
+      if (cards_.end() == cur)
+        cur = cards_.begin();
+    }
 
-    while (removed_[cur])
-      cur = (cur + 1) % k_;
+    clog << card << " -> " << cur->first << '\n';
+    deck_[cur->first] = card;
 
-    deck_[cur] = card;
-    removed_[cur] = true;
+    cur = cards_.erase(cur);
+    if (cards_.end() == cur)
+      cur = cards_.begin();
   }
 }
