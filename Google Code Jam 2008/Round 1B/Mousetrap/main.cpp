@@ -22,7 +22,7 @@ public:
     is >> nCase;
     for (int i = 0; i < nCase; ++i)
     {
-      TCase c;
+      TCase c(i + 1);
       c.ReadFrom(is);
       c.Compute();
       os << "Case #" << i + 1 << ": ";
@@ -35,12 +35,17 @@ public:
 class Case
 {
 public:
+  Case(int iCase) : iCase_(iCase) {}
+
+public:
   void ReadFrom(std::istream &is);      // read from input stream
   void WriteTo(std::ostream &os) const; // write result to output stream
 
   void Compute(); // main body of alogrithm
 
 private:
+  int iCase_;
+
   // input & output
   int k_, nd_;
   vector<int> d_;
@@ -66,7 +71,7 @@ private:
 };
 
 #define TRACE() AutoClock ac(__FUNCTION__)
-#define TRACE(str) AutoClock ac(str)
+//#define TRACE(str) AutoClock ac(str)
 //#define TRACE()
 
 int main(int argc, char **argv)
@@ -95,6 +100,7 @@ void Case::WriteTo(std::ostream &os) const
 void Case::Compute()
 {
   TRACE();
+  clog << "Case #" << iCase_ << ": " << k_ << " cards" << '\n';
 
   list<pair<int, int>> cards_(k_);
   std::generate(cards_.begin(), cards_.end(),
@@ -110,7 +116,7 @@ void Case::Compute()
         cur = cards_.begin();
     }
 
-    clog << card << " -> " << cur->first << '\n';
+    //clog << card << " -> " << cur->first << '\n';
     deck_[cur->first] = card;
 
     cur = cards_.erase(cur);
