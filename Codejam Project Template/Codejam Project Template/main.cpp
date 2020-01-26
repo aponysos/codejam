@@ -32,6 +32,9 @@ public:
 class Case
 {
 public:
+  Case(int iCase) : iCase_(iCase) {}
+
+public:
   void ReadFrom(std::istream &is);      // read from input stream
   void WriteTo(std::ostream &os) const; // write result to output stream
 
