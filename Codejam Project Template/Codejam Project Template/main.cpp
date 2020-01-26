@@ -19,7 +19,7 @@ public:
     is >> nCase;
     for (int i = 0; i < nCase; ++i)
     {
-      TCase c;
+      TCase c(i + 1);
       c.ReadFrom(is);
       c.Compute();
       os << "Case #" << i + 1 << ": ";
@@ -38,6 +38,8 @@ public:
   void Compute(); // main body of alogrithm
 
 private:
+  int iCase_; // case # iCase_, 1-based
+
   // input & output members
 
   // intermediate members
@@ -81,4 +83,5 @@ void Case::WriteTo(std::ostream &os) const
 void Case::Compute()
 {
   TRACE();
+  clog << "Case #" << iCase_ << ": " << '\n';
 }
