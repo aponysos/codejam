@@ -7,7 +7,6 @@
 #include <iostream>
 #include <chrono>
 #include <vector>
-#include <list>
 #include <algorithm> // for_each
 
 using namespace std;
@@ -47,9 +46,9 @@ private:
   int iCase_;
 
   // input & output
-  int k_, nd_;
-  vector<int> d_;
-  vector<int> deck_;
+  int nCards_, nQueries_;
+  vector<int> queries_;
+  vector<int> answers_;
 
   // intermediate members
 };
@@ -84,43 +83,43 @@ int main(int argc, char **argv)
 
 void Case::ReadFrom(std::istream &is)
 {
-  is >> k_;
-  is >> nd_;
-  d_.resize(nd_);
-  for_each(d_.begin(), d_.end(), [&is](int &a) { is >> a; });
+  is >> nCards_;
+  is >> nQueries_;
+  queries_.resize(nQueries_);
+  for_each(queries_.begin(), queries_.end(), [&is](int &a) { is >> a; });
 
-  deck_.resize(k_); // init deck
+  // init answers with -1
+  answers_.resize(nQueries_);
+  fill(answers_.begin(), answers_.end(), -1);
 }
 
 void Case::WriteTo(std::ostream &os) const
 {
-  for_each(d_.begin(), d_.end(), [&os, this](int a) { os << deck_[a - 1] << ' '; });
+  for_each(answers_.begin(), answers_.end(), [&os, this](int a) { os << a + 1 << ' '; });
 }
 
 void Case::Compute()
 {
   TRACE();
-  clog << "Case #" << iCase_ << ": " << k_ << " cards" << '\n';
+  clog << "Case #" << iCase_ << ": " << nCards_ << " cards" << '\n';
 
-  list<pair<int, int>> cards_(k_);
-  std::generate(cards_.begin(), cards_.end(),
-                [n = 0]() mutable { return pair<int, int>(n++, 0); });
-
-  auto cur = cards_.begin();
-  for (int card = 1; card <= k_; ++card)
+  for (int i = 0, pos = 0; i < nCards_; ++i)
   {
-    for (int step = 1; step < card; ++step)
-    {
-      ++cur;
-      if (cards_.end() == cur)
-        cur = cards_.begin();
-    }
-
-    //clog << card << " -> " << cur->first << '\n';
-    deck_[cur->first] = card;
-
-    cur = cards_.erase(cur);
-    if (cards_.end() == cur)
-      cur = cards_.begin();
+    // Compute the next position, after wrap-around.
+    pos = (pos + i) % (nCards_ - i);
+    for (int j = 0; j < nQueries_; j++)
+      if (answers_[j] < 0) // query j is not answered yet
+      {
+        if (queries_[j] == pos + 1) // query j is on pos
+        {
+          queries_[j] = -1; // query j is answered
+          answers_[j] = i; // the answer is the current card
+        }
+        else if (queries_[j] > pos + 1) // queries that are after pos
+        {
+          // The effect of deleting the next position.
+          --queries_[j];
+        }
+      }
   }
 }
