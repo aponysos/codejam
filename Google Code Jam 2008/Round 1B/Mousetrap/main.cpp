@@ -7,7 +7,7 @@
 #include <iostream>
 #include <chrono>
 #include <vector>
-#include <algorithm> // for_each
+#include <algorithm> // fill, for_each
 
 using namespace std;
 
@@ -43,7 +43,7 @@ public:
   void Compute(); // main body of alogrithm
 
 private:
-  int iCase_;
+  int iCase_; // case # iCase_, 1-based
 
   // input & output
   int nCards_, nQueries_;
@@ -95,7 +95,7 @@ void Case::ReadFrom(std::istream &is)
 
 void Case::WriteTo(std::ostream &os) const
 {
-  for_each(answers_.begin(), answers_.end(), [&os, this](int a) { os << a + 1 << ' '; });
+  for_each(answers_.begin(), answers_.end(), [&os, this](int i) { os << i + 1 << ' '; });
 }
 
 void Case::Compute()
@@ -103,11 +103,11 @@ void Case::Compute()
   TRACE();
   clog << "Case #" << iCase_ << ": " << nCards_ << " cards" << '\n';
 
-  for (int i = 0, pos = 0; i < nCards_; ++i)
+  for (int i = 0, pos = 0; i < nCards_; ++i) // card i + 1
   {
     // Compute the next position, after wrap-around.
-    pos = (pos + i) % (nCards_ - i);
-    for (int j = 0; j < nQueries_; j++)
+    pos = (pos + i) % (nCards_ - i); // i card(s) been removed, the modular base decreased by i 
+    for (int j = 0; j < nQueries_; j++) // traverse all queries
       if (answers_[j] < 0) // query j is not answered yet
       {
         if (queries_[j] == pos + 1) // query j is on pos
@@ -115,9 +115,11 @@ void Case::Compute()
           queries_[j] = -1; // query j is answered
           answers_[j] = i; // the answer is the current card
         }
-        else if (queries_[j] > pos + 1) // queries that are after pos
+        else if (queries_[j] > pos + 1) // queries beyond pos
         {
           // The effect of deleting the next position.
+          // position pos deleted, so queries beyond pos decrease its modular base by 1
+          // in order to match the modular base of pos in the next round
           --queries_[j];
         }
       }
