@@ -7,7 +7,8 @@
 #include <iostream>
 #include <chrono>
 #include <vector>
-#include <algorithm> // transform sort
+#include <algorithm> // sort
+#include <numeric> // accumulate
 
 using namespace std;
 
@@ -100,19 +101,12 @@ void Case::Compute()
   TRACE();
   clog << "Case #" << iCase_ << ": " << '\n';
 
-  vector<pair<int, int>> f(nLetters_);
-  transform(frequencies_.begin(), frequencies_.end(), f.begin(), 
-           [i = 0](int a) mutable { return make_pair(i++, a); });
-  sort(f.begin(), f.end(), [](auto a, auto b) { return a.second > b.second; });
+  sort(frequencies_.begin(), frequencies_.end(), greater<int>());
 
-  int level = 1, j = 0;
-  for (auto ff : f)
-  {
-    if (j >= nKeys_) {
-      ++level;
-      j = 0;
-    }
-    nPresses_ += ff.second * level;
-    ++j;
-  }
+  int level = 1, sz = frequencies_.size();
+  for (int i = 0; i < sz; i += nKeys_)
+    nPresses_ += accumulate(
+      frequencies_.begin() + i, 
+      i + nKeys_ < sz ? frequencies_.begin() + i + nKeys_ : frequencies_.end(), 
+      0) * level++;
 }
