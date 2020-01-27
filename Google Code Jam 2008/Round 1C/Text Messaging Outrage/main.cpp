@@ -103,10 +103,6 @@ void Case::Compute()
 
   sort(frequencies_.begin(), frequencies_.end(), greater<int>());
 
-  int level = 1, sz = frequencies_.size();
-  for (int i = 0; i < sz; i += nKeys_)
-    nPresses_ += accumulate(
-      frequencies_.begin() + i, 
-      i + nKeys_ < sz ? frequencies_.begin() + i + nKeys_ : frequencies_.end(), 
-      0) * level++;
+  for (size_t i = 0; i < frequencies_.size(); ++i)
+    nPresses_ += (1 + i / nKeys_) * frequencies_[i];
 }
