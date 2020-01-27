@@ -6,6 +6,8 @@
 
 #include <iostream>
 #include <chrono>
+#include <vector>
+#include <algorithm> // transform sort
 
 using namespace std;
 
@@ -44,8 +46,11 @@ private:
   int iCase_; // case # iCase_, 1-based
 
   // input & output members
+  int nLettersInKey_, nKeys_, nLetters_;
+  vector<int> frequencies_;
 
   // intermediate members
+  long long nPresses_;
 };
 
 // auto-output execution time of a function
@@ -77,14 +82,37 @@ int main(int argc, char **argv)
 
 void Case::ReadFrom(std::istream &is)
 {
+  is >> nLettersInKey_ >> nKeys_ >> nLetters_;
+  frequencies_.resize(nLetters_);
+  for (int i = 0; i < nLetters_; ++i)
+    is >> frequencies_[i];
+
+  nPresses_ = 0; // init result
 }
 
 void Case::WriteTo(std::ostream &os) const
 {
+  os << nPresses_;
 }
 
 void Case::Compute()
 {
   TRACE();
   clog << "Case #" << iCase_ << ": " << '\n';
+
+  vector<pair<int, int>> f(nLetters_);
+  transform(frequencies_.begin(), frequencies_.end(), f.begin(), 
+           [i = 0](int a) mutable { return make_pair(i++, a); });
+  sort(f.begin(), f.end(), [](auto a, auto b) { return a.second > b.second; });
+
+  int level = 1, j = 0;
+  for (auto ff : f)
+  {
+    if (j >= nKeys_) {
+      ++level;
+      j = 0;
+    }
+    nPresses_ += ff.second * level;
+    ++j;
+  }
 }
