@@ -6,21 +6,22 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <algorithm>
+#include <algorithm> // min_element
+#include <limits>    // numeric_limits<size_t>::max()
 
 using namespace std;
 
-template<typename TCase>
+template <typename TCase>
 class Problem
 {
 public:
-  void Solve(std::istream & is, std::ostream & os)
+  void Solve(std::istream &is, std::ostream &os)
   {
     int nCase = 0;
     is >> nCase;
-    cases_.resize(nCase);
-    for (int i = 0; i < nCase; ++i) {
-      TCase & c = cases_[i];
+    for (int i = 0; i < nCase; ++i)
+    {
+      TCase c(i + 1);
       c.ReadFrom(is);
       c.Compute();
       os << "Case #" << i + 1 << ": ";
@@ -28,22 +29,29 @@ public:
       os << '\n';
     }
   }
-
-private:
-  std::vector<TCase> cases_;
 };
 
 class Case
 {
 public:
-  void ReadFrom(std::istream & is); // read from input stream
+  Case(int iCase) : iCase_(iCase) {}
+
+public:
+  void ReadFrom(std::istream &is);      // read from input stream
+  void WriteTo(std::ostream &os) const; // write result to output stream
+
   void Compute(); // main body of alogrithm
-  void WriteTo(std::ostream & os) const; // write result to output stream
 
 private:
-  std::vector<std::string> engines_;
-  std::vector<std::string> queries_;
-  int minSwitchTimes_;
+  int iCase_; // case # iCase_, 1-based
+
+private:
+  // input & output members
+  vector<string> engines_;
+  vector<string> queries_;
+  size_t minSwitchTimes_;
+
+  // intermediate members
 };
 
 int main(int argc, char **argv)
@@ -54,56 +62,70 @@ int main(int argc, char **argv)
   return 0;
 }
 
-void Case::ReadFrom(std::istream & is)
+void Case::ReadFrom(std::istream &is)
 {
   // read search engine names
-  int nEngines = 0;
-  cin >> nEngines;
-  cin.get(); // read '\n'
+  size_t nEngines = 0;
+  is >> nEngines;
+  is.get(); // read '\n'
   engines_.resize(nEngines);
-  for (int i = 0; i < nEngines; ++i) {
+  for (size_t i = 0; i < nEngines; ++i)
     getline(is, engines_[i]);
-  }
 
   // read queries
-  int nQueries = 0;
-  cin >> nQueries;
-  cin.get(); // read '\n'
+  size_t nQueries = 0;
+  is >> nQueries;
+  is.get(); // read '\n'
   queries_.resize(nQueries);
-  for (int i = 0; i < nQueries; ++i) {
+  for (size_t i = 0; i < nQueries; ++i)
     getline(is, queries_[i]);
-  }
+
+  minSwitchTimes_ = 0; // init result
 }
 
+void Case::WriteTo(std::ostream &os) const
+{
+  os << minSwitchTimes_;
+}
+
+// my solution: recursive algorithm
 void Case::Compute()
 {
-  minSwitchTimes_ = 0; // init result
+  // switchTimes[iq][is] is the minimum switches needed when
+  // there are iq queries left and the current engine is engines_[is]
+  // NOTE: results in switchTimes[0] are all 0, for that, no more query, no more switch
+  size_t nEngines = engines_.size(), nQueries = queries_.size();
+  vector<vector<size_t>> switchTimes(nQueries + 1); // switchTimes[nQuereis + 1][nEngines]
+  for (size_t iq = 0; iq <= nQueries; ++iq)
+    switchTimes[iq].resize(nEngines);
 
-  size_t nEngines = engines_.size(), nQuereis = queries_.size();
-  vector<vector<int>> switches(nQuereis + 1); // switches[nQuereis + 1][nEngines]
-  for (int iq = 0; iq <= nQuereis; ++iq) {
-    switches[iq].resize(nEngines);
-  }
+  // from where only last ONE query need to be sent, to where all queries need to be sent
+  for (size_t iq = 1; iq <= nQueries; ++iq)
+  {
+    const string &query = queries_[nQueries - iq]; // current query, in reverse order
+    for (size_t ie = 0; ie < nEngines; ++ie)
+    {
+      // the results for the last iq - 1 queries
+      const vector<size_t> &lastSwitchTimes = switchTimes[iq - 1];
+      if (query == engines_[ie]) // the engine's name matches the query
+      {
+        // find the min result in lastSwitchTimes excluding the current engine
+        size_t min_last_switch = numeric_limits<size_t>::max();
+        for (size_t i = 0; i < nEngines; ++i)
+        {
+          if (i == ie) // ignore current engine
+            continue;
+          if (min_last_switch > lastSwitchTimes[i])
+            min_last_switch = lastSwitchTimes[i];
+        }
 
-  for (int iq = 1; iq <= nQuereis; ++iq) {
-    const string & query = queries_[nQuereis - iq]; // reverse
-    for (int is = 0; is < nEngines; ++is) {
-      if (query == engines_[is]) { // 上一组中非此engine的最小值+1
-        vector<int> last_switches(switches[iq - 1]);
-        last_switches.erase(last_switches.begin() + is);
-        int min_last_switch = *min_element(last_switches.begin(), last_switches.end());
-        switches[iq][is] = min_last_switch + 1;
+        switchTimes[iq][ie] = min_last_switch + 1; // one more switch
       }
-      else { // 上一组中此engine的值
-        switches[iq][is] = switches[iq - 1][is];
-      }
+      else // the engine's name doesn't match the query, no more switch
+        switchTimes[iq][ie] = lastSwitchTimes[ie];
     }
   }
 
-  minSwitchTimes_ = *min_element(switches[nQuereis].begin(), switches[nQuereis].end());
-}
-
-void Case::WriteTo(std::ostream & os) const
-{
-  os << minSwitchTimes_;
+  // the minimum result for all queries
+  minSwitchTimes_ = *min_element(switchTimes[nQueries].begin(), switchTimes[nQueries].end());
 }
