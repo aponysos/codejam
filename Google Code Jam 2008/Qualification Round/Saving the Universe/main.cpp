@@ -8,6 +8,7 @@
 #include <string>
 #include <algorithm> // min_element
 #include <limits>    // numeric_limits<size_t>::max()
+#include <set>       // Greedy Solution
 
 using namespace std;
 
@@ -41,6 +42,10 @@ public:
   void WriteTo(std::ostream &os) const; // write result to output stream
 
   void Compute(); // main body of alogrithm
+
+private:
+  void MySolution();
+  void GreedySolution();
 
 private:
   int iCase_; // case # iCase_, 1-based
@@ -88,8 +93,14 @@ void Case::WriteTo(std::ostream &os) const
   os << minSwitchTimes_;
 }
 
-// my solution: recursive algorithm
 void Case::Compute()
+{
+  //MySolution();
+  GreedySolution();
+}
+
+// My Solution: recursive algorithm
+void Case::MySolution()
 {
   // switchTimes[iq][is] is the minimum switches needed when
   // there are iq queries left and the current engine is engines_[is]
@@ -128,4 +139,19 @@ void Case::Compute()
 
   // the minimum result for all queries
   minSwitchTimes_ = *min_element(switchTimes[nQueries].begin(), switchTimes[nQueries].end());
+}
+
+// Contest Analysis Solution: Greedy Solution
+void Case::GreedySolution()
+{
+  set<string> segment;
+  for (auto &q : queries_)
+  {
+    if (segment.find(q) == segment.end() && segment.size() == engines_.size() - 1)
+    { // q is the last type of query in segment
+      ++minSwitchTimes_;
+      segment.clear();
+    }
+    segment.insert(q);
+  }
 }
