@@ -147,11 +147,15 @@ void Case::GreedySolution()
   set<string> segment;
   for (auto &q : queries_)
   {
-    if (segment.find(q) == segment.end() && segment.size() == engines_.size() - 1)
-    { // q is the last type of query in segment
-      ++minSwitchTimes_;
-      segment.clear();
+    if (segment.find(q) == segment.end()) // q not in segment
+    {
+      if (segment.size() == engines_.size() - 1) // q is the last type of query in segment
+      {
+        ++minSwitchTimes_;
+        segment.clear(); // start a new segment
+      }
+
+      segment.insert(q);
     }
-    segment.insert(q);
   }
 }
