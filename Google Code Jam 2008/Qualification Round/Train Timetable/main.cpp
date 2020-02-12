@@ -99,6 +99,14 @@ void Case::WriteTo(std::ostream &os) const
   os << nTrainsNeededA_ << ' ' << nTrainsNeededB_;
 }
 
+// This problem can be solved with a greedy strategy.
+// The simplest way to do this is by scanning through a list of all the trips, sorted by departure time, 
+// and keeping track of the set of trains that will be available at each station, and when they will be ready to take a trip.
+// When we examine a trip, we see if there will be a train ready at the departure station by the departure time.
+// If there is, then we remove that train from the list of available trains.
+// If there is not, then our solution will need one new train added for the departure station.
+// Then we compute when the train taking this trip will be ready at the other station for another trip,
+// and add this train to the set of available trains at the other station. 
 void Case::Compute()
 {
   nTrainsNeededA_ = nTrainsNeededB_ = 0; // init result
@@ -146,7 +154,7 @@ void Case::InitTimeline(Timeline &tml, const Timeline &dpt, const Timeline &arv)
        [](const auto &tm1, const auto &tm2) { return tm1.first < tm2.first || (tm1.first == tm2.first && tm1.second > tm2.second); });
 }
 
-// compute how many trains are needed by the timeline (including all arrival and departure times) 
+// compute how many trains are needed by the timeline (including all arrival and departure times)
 int Case::ComputeTrainsNeeded(const Timeline &tml)
 {
   int nTrainsAvail = 0; // # of trains free for departure
