@@ -5,6 +5,32 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"name": "cmake-sample",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${fileDirname}\\build\\main.exe",
+			"args": [
+				"<",
+				"${fileDirname}\\sample.in",
+				">",
+				"${fileDirname}\\sample.out",
+			],
+			"stopAtEntry": false,
+			"cwd": "${fileDirname}",
+			"environment": [],
+			"externalConsole": false,
+			"MIMode": "gdb",
+			"miDebuggerPath": "gdb.exe",
+			"setupCommands": [
+				{
+					"description": "Enable pretty-printing for gdb",
+					"text": "-enable-pretty-printing",
+					"ignoreFailures": true
+				}
+			],
+			// "preLaunchTask": "cmake-build"
+		},
+		{
 			"name": "sample",
 			"type": "cppdbg",
 			"request": "launch",

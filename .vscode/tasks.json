@@ -4,6 +4,24 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "cmake-build",
+			"type": "shell",
+            "command": "g++.exe",
+            "args": [
+				"${fileDirname}\\main.cpp",
+				"-o",
+				"${fileDirname}\\main.exe",
+				"-g",
+				"-Wall",
+				"-std=c++17",
+			],
+            "problemMatcher": ["$gcc"],
+            "group": {
+                "kind": "build",
+                "isDefault": true,
+			},
+		},
+		{
 			"label": "build",
 			"type": "shell",
             "command": "g++.exe",

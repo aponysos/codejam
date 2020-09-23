@@ -265,3 +265,6 @@ __pycache__/
 
 # Executable files
 *.exe
+
+#CMake build directory
+build/
